@@ -1,0 +1,5 @@
+[
+  { "nombre": "Mojito", "precio": 3500, "categoria": "Con alcohol", "imagen": "mojito.jpg" },
+  { "nombre": "Caipi", "precio": 3800, "categoria": "Con alcohol", "imagen": "caipi.jpg" },
+  { "nombre": "Limonada Fresh", "precio": 2800, "categoria": "Sin alcohol", "imagen": "limonada.jpg" }
+]
