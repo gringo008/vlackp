@@ -1,0 +1,162 @@
+# 🎯 GUÍA RÁPIDA - SISTEMA DE VENTAS
+
+## 📋 ¿QUÉ ESTÁ NUEVO?
+
+Se agregó un **sistema completo de control de ventas** que:
+- ✅ Guarda automáticamente cada pedido en Firestore
+- ✅ Muestra estadísticas de ventas en tiempo real
+- ✅ Permite ver historial de todas las ventas
+- ✅ Permite cambiar estado de pedidos (Pendiente → Entregado → Cancelado)
+
+## 🚀 CÓMO FUNCIONA
+
+### Para Clientes (nada cambió)
+1. Abren `index.html`
+2. Agregan productos al carrito
+3. Seleccionan método de pago
+4. Seleccionan tipo de entrega (Retiro o Envío)
+5. Si eligen Envío, llenan dirección y teléfono
+6. Click "FINALIZAR COMPRA"
+7. **Nuevo**: ¡Su venta se guarda automáticamente en la base de datos!
+
+### Para Admin (nueva funcionalidad)
+1. Entran a `admin.html`
+2. Se loguean con email y contraseña
+3. **NUEVO**: Click en botón **"📊 Ver Reportes"** (arriba a la derecha)
+4. Ven gráficos y tabla de ventas:
+   - Total de ventas
+   - Dinero total ganado
+   - Promedio por venta
+   - Tabla con cada pedido realizado
+   - Gráficos de análisis
+
+## 📊 QUÉ VE EN REPORTES
+
+### Estadísticas (Arriba)
+```
+┌─────────────────────────────────────┐
+│ Total Ventas: 15 │ Ganancias: $4,500 │ Promedio: $300 │
+└─────────────────────────────────────┘
+```
+
+### Historial de Ventas (Tabla)
+```
+Fecha          | Tipo Entrega      | Total   | Estado
+30/11 14:30    | Retiro            | $300    | [Pendiente] ← Click para cambiar
+30/11 15:45    | Envío a domicilio | $450    | [Entregado]
+30/11 16:20    | Retiro            | $200    | [Cancelado]
+```
+
+### Gráficos (Abajo)
+- 💳 Ventas por Método de Pago (Efectivo vs Transferencia)
+- 🚚 Ventas por Tipo de Entrega (Retiro vs Envío)
+- 🍹 Top 5 Productos Vendidos (cuáles venden más)
+
+## 🔄 CAMBIAR ESTADO DE UN PEDIDO
+
+En la tabla de reportes:
+1. Click en donde dice "Pendiente" / "Entregado" / "Cancelado"
+2. Cambia automáticamente al siguiente estado en este orden:
+   - Pendiente → Entregado → Cancelado → Pendiente (ciclo)
+
+## 📱 ARCHIVOS NUEVOS
+
+| Archivo | Qué es | Acceso |
+|---------|--------|--------|
+| `ventas.js` | Módulo de ventas | Importado automáticamente |
+| `reportes.html` | Página de reportes | Click en botón "Ver Reportes" en admin |
+| `README.md` | Documentación completa | Para referencia |
+| `SISTEMA_VENTAS.md` | Detalles técnicos | Para referencia |
+
+## 💾 DÓNDE SE GUARDAN LAS VENTAS
+
+En tu base de datos Firestore, hay una nueva colección llamada **`ventas`** que contiene:
+- Fecha y hora del pedido
+- Productos comprados
+- Total del pedido
+- Método de pago
+- Tipo de entrega
+- Dirección (si es envío)
+- Teléfono del cliente
+- Estado actual del pedido
+
+## 🔒 NOTA IMPORTANTE
+
+Las ventas se guardan **automáticamente** cuando el cliente finaliza el pedido. No necesitas hacer nada especial. El sistema funciona así:
+
+```
+Cliente → "FINALIZAR COMPRA" → Se abre WhatsApp → Se guarda venta → ¡Listo!
+```
+
+## ⚡ FUNCIONALIDADES EXTRA
+
+### Filtrar Ventas
+En la página de reportes, puedes filtrar ventas:
+- **Todas** - Ver todas las ventas
+- **Pendientes** - Solo pedidos sin entregar
+- **Entregadas** - Solo pedidos completados
+- **Canceladas** - Solo pedidos cancelados
+
+### Análisis Automático
+El sistema calcula automáticamente:
+- Total ganado en pesos
+- Promedio ganado por venta
+- Qué producto vende más
+- Cuál es el método de pago preferido
+- Si prefieren retiro o envío
+
+## ❓ PREGUNTAS FRECUENTES
+
+**P: ¿Se pierden las ventas si cierro la página?**
+R: No, se guardan en Firestore. Al abrir reportes.html de nuevo, ¡siguen ahí!
+
+**P: ¿Puedo editar una venta grabada?**
+R: Por ahora solo puedes cambiar el estado. Para editar datos, necesitarías acceso a Firestore directamente.
+
+**P: ¿Cuántas ventas puedo registrar?**
+R: Unlimited. Firestore puede guardar millones de documentos sin problema.
+
+**P: ¿Se ve bien en móvil?**
+R: Sí, la página de reportes es responsive.
+
+**P: ¿Qué pasa si hay una venta mientras veo reportes?**
+R: Se actualiza automáticamente en tiempo real. No necesitas refrescar.
+
+## 🎓 EJEMPLO REAL
+
+**Escenario**: Cliente compra en tu tienda
+
+```
+Cliente abre index.html
+    ↓
+Agrega: 2x Flynpaff ($150 c/u) + 1x Serenito ($150)
+    ↓
+Selecciona: Efectivo + Envío a domicilio
+    ↓
+Completa: Dirección: "Calle 123" + Teléfono: "3516577826"
+    ↓
+Click "FINALIZAR COMPRA"
+    ↓
+WhatsApp se abre con el pedido preformulado
+    ↓
+¡VENTA REGISTRADA EN FIRESTORE! ✅
+    ↓
+Admin ve en Reportes:
+  - Nueva venta: $450
+  - Método: Efectivo
+  - Entrega: Envío a domicilio
+  - Dirección: Calle 123
+  - Teléfono: 3516577826
+  - Estado: Pendiente (puede cambiar a Entregado)
+```
+
+## 🎉 ¡LISTO!
+
+Tu sistema está completamente funcional. Solo falta que:
+1. Agregues más productos desde admin.html
+2. Clientes empiecen a comprar
+3. Monitorees ventas en reportes.html
+
+---
+
+**Cualquier duda, revisa `README.md` para documentación completa** 📖

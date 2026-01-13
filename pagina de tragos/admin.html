@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Admin VLACK</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-container" id="loginBox">
+    <h2>🔐 INGRESAR ADMIN</h2>
+    <input type="email" id="user" placeholder="📧 Usuario (email)">
+    <input type="password" id="pass" placeholder="🔑 Contraseña">
+    <button onclick="login()">✓ Ingresar</button>
+  </div>
+
+  <!-- PANEL ADMIN -->
+  <div id="adminPanel" style="display:none;">
+    <div class="header-buttons">
+      <button class="btn-pedidos" onclick="mostrarPedidosEnVivo()">📦 Pedidos en vivo</button>
+      <button class="btn-reportes" onclick="window.location.href='reportes.html'">📊 Ver Reportes</button>
+      <button class="btn-logout" onclick="logout()">🚪 Cerrar Sesión</button>
+    </div>
+
+    <h1>⚙️ Panel de Administración</h1>
+
+    <!-- Estado del admin -->
+    <div id="adminStatus">No autenticado</div>
+    <audio id="pedidoSound" preload="auto">
+  <source src="pedido.mp3" type="audio/mpeg">
+</audio>
+
+
+    <!-- ✅ PANEL PEDIDOS EN VIVO -->
+    <div id="pedidosEnVivoPanel" style="display:none;">
+      <h2 class="titulo-pedidos">📦 PEDIDOS EN VIVO</h2>
+
+      <div class="filtro-estado">
+        <button class="filtro-btn active" onclick="filtrarPedidosEstado('todos')">Todos</button>
+        <button class="filtro-btn" onclick="filtrarPedidosEstado('Pendiente')">Pendientes</button>
+        <button class="filtro-btn" onclick="filtrarPedidosEstado('Preparando')">Preparando</button>
+        <button class="filtro-btn" onclick="filtrarPedidosEstado('Listo')">Listos</button>
+        <button class="filtro-btn" onclick="filtrarPedidosEstado('Entregado')">Entregados</button>
+        <button class="filtro-btn" onclick="filtrarPedidosEstado('Cancelado')">Cancelados</button>
+      </div>
+
+      <div id="pedidosList" class="pedidos-list">
+        <div class="pedido-loading">Cargando pedidos...</div>
+      </div>
+    </div>
+
+    <!-- ✅ PANEL PRODUCTOS -->
+    <div id="panelProductos">
+
+      <!-- NAV BAR -->
+      <nav class="nav-bar">
+        <button onclick="mostrarSeccion('tragos')">🍸 Tragos</button>
+        <button onclick="mostrarSeccion('promos')">⭐ Promos</button>
+        <button onclick="mostrarSeccion('comidas')">🍕 Comidas</button>
+      </nav>
+
+      <!-- SECCIÓN TRAGOS -->
+      <section id="seccion-tragos" class="seccion-panel active">
+        <h3>🍹 Agregar nuevo trago</h3>
+
+        <input type="text" id="tragoNombre" placeholder="Nombre del trago">
+        <input type="number" id="tragoPrecio" placeholder="Precio" step="0.01">
+
+        <label for="tragoImagenSelect">🖼️ Seleccionar imagen:</label>
+        <select id="tragoImagenSelect">
+          <option value="">-- Elegir imagen --</option>
+          <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+          <option value="img/flynpaff.jpeg">flynpaff</option>
+          <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
+          <option value="img/lemondchamp.jpeg">lemondchamp</option>
+          <option value="img/milipili.jpeg">milipili</option>
+          <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+          <option value="img/serenito con vos.jpeg">serenito con vos</option>
+        </select>
+
+        <input type="file" id="tragoImagenArchivo" accept="image/*">
+        <input type="text" id="tragoImagenURL" placeholder="O pegar URL de la imagen">
+
+        <div class="check-skip">
+          <label><input type="checkbox" id="skipUploadTrago"> Crear sin subir archivo (usar URL o dejar vacío)</label>
+        </div>
+
+        <button class="admin-action" onclick="agregarTrago()" disabled>✓ Agregar</button>
+
+        <h3>📋 Tragos cargados</h3>
+        <table id="tablaTragos">
+          <thead>
+            <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- SECCIÓN PROMOS -->
+      <section id="seccion-promos" class="seccion-panel" style="display:none;">
+        <h3>⭐ Agregar promo</h3>
+
+        <input type="text" id="promoNombre" placeholder="Nombre de la promo">
+        <input type="number" id="promoPrecio" placeholder="Precio" step="0.01">
+
+        <label for="promoImagenSelect">🖼️ Seleccionar imagen:</label>
+        <select id="promoImagenSelect">
+          <option value="">-- Elegir imagen --</option>
+          <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+          <option value="img/flynpaff.jpeg">flynpaff</option>
+          <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
+          <option value="img/lemondchamp.jpeg">lemondchamp</option>
+          <option value="img/milipili.jpeg">milipili</option>
+          <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+          <option value="img/serenito con vos.jpeg">serenito con vos</option>
+        </select>
+
+        <input type="file" id="promoImagenArchivo" accept="image/*">
+        <input type="text" id="promoImagenURL" placeholder="O pegar URL">
+
+        <div class="check-skip">
+          <label><input type="checkbox" id="skipUploadPromo"> Crear sin subir archivo (usar URL o dejar vacío)</label>
+        </div>
+
+        <button class="admin-action" onclick="agregarPromo()" disabled>✓ Agregar</button>
+
+        <h3>📋 Promos cargadas</h3>
+        <table id="tablaPromos">
+          <thead>
+            <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- SECCIÓN COMIDAS -->
+      <section id="seccion-comidas" class="seccion-panel" style="display:none;">
+        <h3>🍕 Agregar comida</h3>
+
+        <input type="text" id="comidaNombre" placeholder="Nombre de la comida">
+        <input type="number" id="comidaPrecio" placeholder="Precio" step="0.01">
+
+        <label for="comidaImagenSelect">🖼️ Seleccionar imagen:</label>
+        <select id="comidaImagenSelect">
+          <option value="">-- Elegir imagen --</option>
+          <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+          <option value="img/flynpaff.jpeg">flynpaff</option>
+          <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
+          <option value="img/lemondchamp.jpeg">lemondchamp</option>
+          <option value="img/milipili.jpeg">milipili</option>
+          <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+          <option value="img/serenito con vos.jpeg">serenito con vos</option>
+        </select>
+
+        <input type="file" id="comidaImagenArchivo" accept="image/*">
+        <input type="text" id="comidaImagenURL" placeholder="O pegar URL">
+
+        <div class="check-skip">
+          <label><input type="checkbox" id="skipUploadComida"> Crear sin subir archivo (usar URL o dejar vacío)</label>
+        </div>
+
+        <button class="admin-action" onclick="agregarComida()" disabled>✓ Agregar</button>
+
+        <h3>📋 Comidas cargadas</h3>
+        <table id="tablaComidas">
+          <thead>
+            <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- SIEMPRE CARGAR FIREBASE ANTES DEL ADMIN -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="admin.js"></script>
+
+</body>
+</html>

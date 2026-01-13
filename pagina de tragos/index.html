@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLACK Traguitos 🍹</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>🍹 VLACK TRAGOS</h1>
+    <div class="cart-icon" onclick="openCart()" title="Ver carrito">🛒<span id="cartCount">0</span></div>
+</header>
+
+<!-- 🔥 NAV BAR -->
+<nav class="nav-bar">
+    <button onclick="mostrarSeccion('tragos')">🍸 Tragos</button>
+    <button onclick="mostrarSeccion('promos')">⭐ Promos</button>
+    <button onclick="mostrarSeccion('comidas')">🍕 Comidas</button>
+</nav>
+
+<!-- 📦 DONDE SE CARGAN LOS PRODUCTOS -->
+<section class="drink-list" id="drinkList">
+    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #0f0;">
+        <p style="font-size: 18px; animation: softPulse 2s infinite;">Cargando productos...</p>
+    </div>
+</section>
+
+<!-- DEBUG: recargar manualmente desde la UI -->
+<div style="position:fixed; left:10px; bottom:10px; z-index:999;">
+    <button onclick="(function(){ console.log('Debug reload'); if(window.mostrarSeccion) { mostrarSeccion('tragos'); } if(window.debugShowArrays) window.debugShowArrays(); })()" style="background: linear-gradient(135deg, #666 0%, #999 100%); color: white; padding: 10px 15px; border: none; border-radius: 20px; cursor: pointer; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">🔄 Recargar</button>
+</div>
+
+<!-- 🛒 MODAL DEL CARRITO -->
+<div id="cartModal" class="cart-modal">
+    <div class="cart-content">
+        <span class="close" onclick="closeCart()" title="Cerrar carrito">✖</span>
+        <h2>🛒 Tu Pedido</h2>
+
+        <ul id="cartItems"></ul>
+        
+        <div style="background: rgba(0, 255, 0, 0.1); border: 1px solid rgba(0, 255, 0, 0.3); border-radius: 8px; padding: 12px; margin: 15px 0;">
+            <p style="font-size: 13px; color: #0f0; margin: 0; font-weight: 600;">
+                Desliza para eliminar un producto
+            </p>
+        </div>
+
+        <div style="background: rgba(0, 0, 0, 0.4); border-radius: 10px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 18px; color: #0f0; font-weight: 900;">
+                💰 Total: $<span id="cartTotal">0</span>
+            </p>
+        </div>
+
+        <h3>💳 Forma de pago</h3>
+        <select id="paymentMethod">
+            <option>💵 Efectivo</option>
+            <option>🏦 Transferencia</option>
+        </select>
+
+        <h3>🚗 ¿Retirar o Envío?</h3>
+        <select id="deliveryMethod" onchange="toggleDeliveryFields()">
+            <option>📍 Retiro en el lugar</option>
+            <option>🚚 Envío a domicilio</option>
+        </select>
+
+        <div id="deliveryFields" style="display:none;">
+            <input type="text" id="direccion" placeholder="📬 Dirección">
+            <input type="text" id="telefono" placeholder="📱 Teléfono">
+        </div>
+
+        <button id="finalizarCompra" onclick="finalizarPedido()">✓ FINALIZAR COMPRA</button>
+    </div>
+</div>
+
+<!-- ⚡ ORDEN CORRECTO DE SCRIPTS -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

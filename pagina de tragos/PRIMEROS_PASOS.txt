@@ -1,0 +1,404 @@
+# 🎯 PRIMEROS PASOS - CÓMO USAR TU SISTEMA
+
+## ⏱️ 5 MINUTOS PARA EMPEZAR
+
+### Paso 1: Abre la Tienda (1 min)
+```
+1. En tu navegador, abre: index.html
+2. Verás todos tus productos cargados
+3. Puedes ver: Tragos, Promos, Comidas
+```
+
+### Paso 2: Agrega Producto al Carrito (1 min)
+```
+1. Click en "Agregar 🛒" en cualquier producto
+2. Verás que el icono del carrito se anima
+3. El modal carrito se abre automáticamente
+4. Puedes agregar más productos (repetir paso 1)
+```
+
+### Paso 3: Completa la Compra (2 min)
+```
+1. En el modal carrito, selecciona:
+   - Forma de pago: Efectivo o Transferencia
+   - Tipo de entrega: Retiro o Envío
+   
+2. Si seleccionaste ENVÍO:
+   - Completa Dirección
+   - Completa Teléfono
+   
+3. Click "FINALIZAR COMPRA"
+4. Se abre WhatsApp con el pedido
+5. Completa el pedido en WhatsApp
+6. ¡Tu venta se guardó automáticamente!
+```
+
+### Paso 4: Ve los Reportes (1 min)
+```
+1. Abre admin.html
+2. Login con tu email y contraseña
+3. Click botón "📊 Ver Reportes" (arriba derecha)
+4. ¡Ves tu venta registrada con todos los datos!
+```
+
+---
+
+## 👤 PARA CLIENTES
+
+### Comprar un Producto
+
+**Pantalla: index.html**
+
+1. ✅ Explora el catálogo (Tragos, Promos, Comidas)
+2. ✅ Selecciona el producto que quieres
+3. ✅ Click en "Agregar 🛒"
+4. ✅ El carrito se abre automáticamente
+5. ✅ Puedes agregar más productos
+6. ✅ Selecciona:
+   - 💳 **Forma de pago:** Efectivo o Transferencia
+   - 🚚 **Tipo de entrega:** Retiro o Envío
+   - 📬 **Si es Envío:** Dirección y Teléfono
+7. ✅ Click "FINALIZAR COMPRA"
+8. ✅ ¡Se abre WhatsApp automáticamente!
+9. ✅ Completa la conversación en WhatsApp
+
+**Resultado:**
+- Tu pedido llega a WhatsApp del vendedor
+- Tu venta se guarda en la base de datos
+- Tu carrito se limpia
+
+---
+
+## 🛡️ PARA ADMIN (GERENCIAR TIENDA)
+
+### 1️⃣ Agregar Productos
+
+**Pantalla: admin.html**
+
+```
+1. Login con tu email y contraseña
+
+2. Ve a la sección que quieres (Tragos, Promos, Comidas)
+
+3. Completa los campos:
+   - Nombre: Ej "Flynpaff"
+   - Precio: Ej "150"
+   - Selecciona imagen del dropdown
+   
+4. (Opcional) Sube archivo o pega URL
+   
+5. Click "✓ Agregar"
+
+6. ¡Se agrega automáticamente a la tienda!
+   (Los clientes lo ven al instante)
+```
+
+### 2️⃣ Editar Productos
+
+```
+1. Ve a la sección del producto
+
+2. En la tabla "Tragos/Promos/Comidas cargados"
+
+3. Click en el lápiz ✏️ del producto
+
+4. Completa los nuevos datos
+
+5. Se actualiza automáticamente en tienda
+```
+
+### 3️⃣ Eliminar Productos
+
+```
+1. Ve a la sección del producto
+
+2. En la tabla "Tragos/Promos/Comidas cargados"
+
+3. Click en la X ❌ del producto
+
+4. Se elimina de inmediato de la tienda
+```
+
+### 4️⃣ Ver Reportes de Ventas
+
+**Pantalla: reportes.html (acceso desde admin.html)**
+
+```
+1. En admin.html, click "📊 Ver Reportes"
+
+2. Ves:
+
+   📊 ESTADÍSTICAS (Arriba)
+   ├─ Total Ventas: 15
+   ├─ Ganancias: $4,500
+   └─ Promedio: $300 por venta
+
+   🛍️ HISTORIAL (Centro)
+   ├─ Tabla con TODAS las ventas
+   ├─ Fecha, hora, total, estado
+   └─ Filtros: Todas, Pendiente, Entregada, Cancelada
+
+   📈 GRÁFICOS (Abajo)
+   ├─ Ventas por Método de Pago
+   ├─ Ventas por Tipo de Entrega
+   └─ Top 5 Productos Vendidos
+```
+
+### 5️⃣ Cambiar Estado de Pedido
+
+```
+1. En reportes, ve la tabla de ventas
+
+2. Click en donde dice "Pendiente" o "Entregado"
+
+3. Cambia al siguiente estado:
+   Pendiente → Entregado → Cancelado → Pendiente
+
+4. Se actualiza al instante
+```
+
+### 6️⃣ Cerrar Sesión
+
+```
+1. En admin.html, click "🚪 Cerrar Sesión"
+
+2. Vuelve a la pantalla de login
+
+3. Puedes hacer logout seguro
+```
+
+---
+
+## 📊 INTERPRETAR LOS REPORTES
+
+### Tabla de Ventas
+
+```
+Fecha/Hora | Tipo Entrega      | Total | Estado
+30/11 14:30| Retiro            | $300  | Pendiente
+30/11 15:45| Envío domicilio   | $450  | Entregado
+30/11 16:20| Retiro            | $200  | Cancelado
+```
+
+**¿Qué significa?**
+- **Pendiente:** Pedido sin entregar aún
+- **Entregado:** Pedido completado
+- **Cancelado:** Pedido cancelado
+
+### Gráfico Método de Pago
+
+```
+Efectivo     ██████████  10 ventas
+Transferencia ████████    5 ventas
+```
+
+**¿Qué significa?**
+- Tus clientes prefieren pagar con Efectivo
+- 2 de cada 3 pedidos son en Efectivo
+
+### Gráfico Tipo de Entrega
+
+```
+Retiro    █████████   9 ventas
+Envío     ███████     6 ventas
+```
+
+**¿Qué significa?**
+- Más clientes retiran en persona
+- Pero también hay demanda de envío
+
+### Top 5 Productos
+
+```
+Flynpaff      ██████████  10 unidades
+Serenito      ████████     8 unidades
+Sangría       ██████       6 unidades
+Lemondchamp   ████         4 unidades
+Milipili      ██           2 unidades
+```
+
+**¿Qué significa?**
+- Flynpaff es tu producto estrella
+- Vende el doble que Sangría
+- Podrías aumentar stock de Flynpaff
+
+---
+
+## 🔧 CONFIGURAR COSAS
+
+### Cambiar Número de WhatsApp
+
+1. Abre `script.js`
+2. Busca: `543516577826`
+3. Cambia por tu número (sin + ni espacios)
+4. Ejemplo: `543516577826` → `543512345678`
+5. Guarda archivo
+
+### Cambiar Colores
+
+1. Abre `style.css`
+2. Busca: `#0f0` (verde)
+3. Cambia por otro color:
+   - `#ff0000` (rojo)
+   - `#0000ff` (azul)
+   - `#ffff00` (amarillo)
+4. Guarda archivo
+5. Refresca navegador
+
+### Agregar Más Imágenes
+
+1. Guarda imagen en carpeta `/img`
+2. Abre `admin.html`
+3. Busca el `<select id="tragoImagenSelect">`
+4. Agrega nueva opción:
+   ```html
+   <option value="img/nombre-imagen.jpg">nombre-imagen</option>
+   ```
+5. Guarda archivo
+
+---
+
+## ❓ PROBLEMAS COMUNES
+
+### Problema: "No veo productos"
+
+**Soluciones:**
+1. Verifica conexión a Internet
+2. Recarga la página (Ctrl+F5)
+3. Verifica que Firebase esté conectado
+
+### Problema: "No se abre WhatsApp"
+
+**Soluciones:**
+1. Verifica que tengas WhatsApp Web activado
+2. Verifica el número en `script.js`
+3. Intenta desde otra pestaña
+
+### Problema: "No veo ventas en reportes"
+
+**Soluciones:**
+1. Verifica que completaste una compra
+2. Refresca la página reportes.html
+3. Verifica login en Firebase
+
+### Problema: "Admin no me deja agregar producto"
+
+**Soluciones:**
+1. Verifica que escribiste nombre y precio
+2. Verifica que seleccionaste una imagen
+3. Recarga admin.html
+
+### Problema: "Producto desapareció"
+
+**Soluciones:**
+1. Refresca la página
+2. Verifica que no lo hayas eliminado
+3. Revisa historial de cambios en Firebase
+
+---
+
+## 🎓 EJEMPLO COMPLETO
+
+### Escenario: Vendedor nuevo quiere probar
+
+**Paso 1: Agregar productos (5 min)**
+```
+1. Abre admin.html
+2. Login
+3. Sección "Tragos"
+4. Nombre: "Mi Bebida Especial"
+5. Precio: 200
+6. Selecciona imagen
+7. Click "Agregar"
+8. ¡Se ve en tienda al instante!
+```
+
+**Paso 2: Hacer una venta de prueba (3 min)**
+```
+1. Abre index.html en otra pestaña
+2. Busca "Mi Bebida Especial"
+3. Click "Agregar"
+4. Selecciona Efectivo + Retiro
+5. Click "FINALIZAR"
+6. Copia el mensaje pero no lo envíes
+```
+
+**Paso 3: Ver en reportes (1 min)**
+```
+1. Vuelve a admin.html
+2. Click "Ver Reportes"
+3. ¡Ves tu venta en la tabla!
+4. Estadísticas actualizadas
+```
+
+**Resultado:**
+- Aprendiste a agregar productos ✅
+- Aprendiste a procesar compras ✅
+- Aprendiste a ver reportes ✅
+
+---
+
+## 📱 VERSIÓN MÓVIL
+
+Tu tienda funciona perfecto en móviles:
+
+1. **Abre index.html en tu celular**
+2. **Se adapta automáticamente**
+3. **Carrito funciona igual**
+4. **Reportes se ven bien**
+
+**Tips móvil:**
+- Los botones son más grandes
+- Desliza hacia abajo para ver más
+- Todo se ajusta al tamaño de pantalla
+
+---
+
+## 💡 CONSEJOS ÚTILES
+
+✅ **Actualiza productos regularmente**
+   Si cambias precios, actualiza en admin
+
+✅ **Revisa reportes diariamente**
+   Saber qué vende más es importante
+
+✅ **Mantén imágenes de calidad**
+   Las imágenes venden productos
+
+✅ **Responde rápido en WhatsApp**
+   Los clientes valoran atención rápida
+
+✅ **Analiza tendencias**
+   Usa datos de reportes para decidir inventario
+
+---
+
+## 🚀 AHORA QUÉ?
+
+**Que funciona:**
+- ✅ Tienda online lista
+- ✅ Sistema de pedidos
+- ✅ Reportes de ventas
+- ✅ Admin panel
+
+**Próximos pasos:**
+1. Agrega todos tus productos
+2. Invita clientes a comprar
+3. Revisa reportes regularmente
+4. Ajusta según demanda
+5. ¡Crece tu negocio!
+
+---
+
+**¡Felicidades! Ahora estás listo para usar tu sistema.** 🎉
+
+Si necesitas ayuda, revisa:
+- `GUIA_RAPIDA.txt` - Resumen rápido
+- `README.md` - Documentación completa
+- `INDEX.md` - Índice de todo
+
+---
+
+**¿Preguntas? Consulta la documentación correspondiente.**
+
+🚀 **¡A vender!** 💰
