@@ -1,240 +1,293 @@
+// script.js
 // ==========================
-// 🔹 SCRIPT PRINCIPAL - FIRESTORE
+// 🔹 SCRIPT PRINCIPAL - TIENDA
 // ==========================
-import { db } from "./firebase.js";
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-import { guardarVenta } from "./ventas.js";
 
-// ==========================
-// 🔹 1) VARIABLES (LOCAL)
-// ==========================
+import { db } from "./firebase.js";
+import {
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+import { crearVenta } from "./ventas.js";
+
+/* ======================================================
+   🔧 UTILIDADES
+====================================================== */
+
+function toNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function cleanString(v) {
+  return v === undefined || v === null ? "" : String(v).trim();
+}
+
+function ensureArray(arr) {
+  return Array.isArray(arr) ? arr : [];
+}
+
+function escapeQuotes(text) {
+  return cleanString(text).replace(/'/g, "\\'");
+}
+
+/* ======================================================
+   🔹 ESTADO GLOBAL
+====================================================== */
+
 let tragos = [];
 let promos = [];
 let comidas = [];
-let cart = JSON.parse(localStorage.getItem('carrito')) || [];
-let currentSection = 'tragos';
 
-// ==========================
-// 🔹 2) CARGAR DESDE FIRESTORE EN TIEMPO REAL
-// ==========================
+let cart = [];
+let currentSection = "tragos";
+
+/* ======================================================
+   🔹 INICIALIZACIÓN CARRITO
+====================================================== */
+
+function cargarCarritoLocal() {
+  try {
+    const stored = JSON.parse(localStorage.getItem("carrito"));
+    cart = ensureArray(stored);
+  } catch {
+    cart = [];
+  }
+  actualizarCartCount();
+}
+
+cargarCarritoLocal();
+
+/* ======================================================
+   🔹 CARGA FIRESTORE EN TIEMPO REAL
+====================================================== */
+
 function cargarDesdeFirestore() {
-  // Cargar TRAGOS
   onSnapshot(collection(db, "tragos"), (snapshot) => {
-        console.log('Snapshot TRAGOS received, docs:', snapshot.size);
-        tragos = [];
-        snapshot.forEach((doc) => {
-            const d = { id: doc.id, ...doc.data() };
-            tragos.push(d);
-        });
-        console.log('Loaded tragos array length:', tragos.length, tragos);
-        if (currentSection === 'tragos') cargarProductos(tragos);
+    tragos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentSection === "tragos") cargarProductos(tragos);
   });
 
-  // Cargar PROMOS
   onSnapshot(collection(db, "promos"), (snapshot) => {
-        console.log('Snapshot PROMOS received, docs:', snapshot.size);
-        promos = [];
-        snapshot.forEach((doc) => {
-            const d = { id: doc.id, ...doc.data() };
-            promos.push(d);
-        });
-        console.log('Loaded promos array length:', promos.length, promos);
-        if (currentSection === 'promos') cargarProductos(promos);
+    promos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentSection === "promos") cargarProductos(promos);
   });
 
-  // Cargar COMIDAS
   onSnapshot(collection(db, "comidas"), (snapshot) => {
-        console.log('Snapshot COMIDAS received, docs:', snapshot.size);
-        comidas = [];
-        snapshot.forEach((doc) => {
-            const d = { id: doc.id, ...doc.data() };
-            comidas.push(d);
-        });
-        console.log('Loaded comidas array length:', comidas.length, comidas);
-        if (currentSection === 'comidas') cargarProductos(comidas);
+    comidas = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentSection === "comidas") cargarProductos(comidas);
   });
 }
 
-// Iniciar carga de Firestore
 cargarDesdeFirestore();
 
+/* ======================================================
+   🔹 NAVEGACIÓN
+====================================================== */
 
-// ==========================
-// 🔹 3) NAVEGACIÓN
-// ==========================
-function mostrarSeccion(tipo) {
-    if (tipo === 'tragos') cargarProductos(tragos);
-    if (tipo === 'promos') cargarProductos(promos);
-    if (tipo === 'comidas') cargarProductos(comidas);
-    currentSection = tipo;
-}
+window.mostrarSeccion = function (tipo) {
+  currentSection = tipo;
+  if (tipo === "tragos") cargarProductos(tragos);
+  if (tipo === "promos") cargarProductos(promos);
+  if (tipo === "comidas") cargarProductos(comidas);
+};
 
+/* ======================================================
+   🔹 RENDER PRODUCTOS
+====================================================== */
 
-// ==========================
-// 🔹 4) CARGAR PRODUCTOS EN LA PÁGINA
-// ==========================
 const drinkList = document.getElementById("drinkList");
 
 function cargarProductos(lista) {
-    drinkList.innerHTML = "";
-    lista.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "drink-card";
-        card.style.animationDelay = `${index * 0.1}s`;
+  drinkList.innerHTML = "";
 
-        card.innerHTML = `
-            <img src="${item.imagen || 'img/default.jpg'}" alt="${item.nombre}">
-            <div class="drink-card-content">
-                <h3>${item.nombre}</h3>
-                <p>$${item.precio}</p>
-                <button onclick="agregarCarrito('${item.nombre}', ${item.precio}, '${item.imagen}')">Agregar 🛒</button>
-            </div>
-        `;
-        drinkList.appendChild(card);
-    });
+  ensureArray(lista).forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "drink-card";
+    card.style.animationDelay = `${index * 0.1}s`;
+
+    const nombre = cleanString(item.nombre) || "Producto";
+    const precio = toNumber(item.precio);
+    const imagen = cleanString(item.imagen) || "img/default.jpg";
+
+    card.innerHTML = `
+      <img src="${imagen}" alt="${nombre}">
+      <div class="drink-card-content">
+        <h3>${nombre}</h3>
+        <p>$${precio}</p>
+        <button onclick="agregarCarrito('${escapeQuotes(nombre)}', ${precio}, '${escapeQuotes(imagen)}')">
+          Agregar 🛒
+        </button>
+      </div>
+    `;
+
+    drinkList.appendChild(card);
+  });
 }
 
+/* ======================================================
+   🔹 CARRITO
+====================================================== */
 
-// ==========================
-// 🔹 5) CARRITO
-// ==========================
-function agregarCarrito(nombre, precio, imagen) {
-    cart.push({ nombre, precio, imagen });
-    localStorage.setItem("carrito", JSON.stringify(cart));
-    actualizarCartCount();
-    animarCarrito();
-    mostrarCarrito();
-    openCart();
+window.agregarCarrito = function (nombre, precio, imagen) {
+  cart.push({
+    nombre: cleanString(nombre),
+    precio: toNumber(precio),
+    imagen: cleanString(imagen)
+  });
+
+  persistirCarrito();
+  animarCarrito(); // ✅ SOLO animación, NO abre el carrito
+};
+
+function persistirCarrito() {
+  localStorage.setItem("carrito", JSON.stringify(cart));
+  actualizarCartCount();
+  mostrarCarrito();
 }
 
 function actualizarCartCount() {
-    document.getElementById("cartCount").textContent = cart.length;
-};
+  const el = document.getElementById("cartCount");
+  if (el) el.textContent = cart.length;
+}
 
 function mostrarCarrito() {
-    const cartItems = document.getElementById("cartItems");
-    const cartTotal = document.getElementById("cartTotal");
+  const cartItems = document.getElementById("cartItems");
+  const cartTotal = document.getElementById("cartTotal");
 
-    cartItems.innerHTML = "";
-    let total = 0;
+  if (!cartItems || !cartTotal) return;
 
-    cart.forEach((item, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <img src="${item.imagen || 'img/default.jpg'}" class="cart-img" alt="${item.nombre}">
-            <span>${item.nombre}</span>
-            <span>$${item.precio}</span>
-            <button class="remove-btn" onclick="eliminarItem(${index})">✕</button>
-        `;
-        cartItems.appendChild(li);
-        total += item.precio;
-    });
+  cartItems.innerHTML = "";
+  let total = 0;
 
-    cartTotal.textContent = total;
+  cart.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <img src="${item.imagen || "img/default.jpg"}" class="cart-img">
+      <span>${item.nombre}</span>
+      <span>$${item.precio}</span>
+      <button class="remove-btn" onclick="eliminarItem(${index})">✕</button>
+    `;
+    cartItems.appendChild(li);
+    total += toNumber(item.precio);
+  });
+
+  cartTotal.textContent = total;
 }
 
-function eliminarItem(index) {
-    cart.splice(index, 1);
-    localStorage.setItem("carrito", JSON.stringify(cart));
-    actualizarCartCount();
-    mostrarCarrito();
-}
+window.eliminarItem = function (index) {
+  cart.splice(index, 1);
+  persistirCarrito();
+};
 
+/* ======================================================
+   🔹 MODAL CARRITO
+====================================================== */
 
-// ==========================
-// 🔹 6) MODAL DEL CARRITO
-// ==========================
-function openCart() { 
-    document.getElementById("cartModal").style.display = "block"; 
-    mostrarCarrito();
-}
+window.openCart = function () {
+  const modal = document.getElementById("cartModal");
+  if (modal) modal.style.display = "block";
+  mostrarCarrito();
+};
 
-function closeCart() { 
-    document.getElementById("cartModal").style.display = "none"; 
-}
+window.closeCart = function () {
+  const modal = document.getElementById("cartModal");
+  if (modal) modal.style.display = "none";
+};
 
 function animarCarrito() {
-    const cartIcon = document.querySelector(".cart-icon");
-    cartIcon.classList.add("animate");
-    setTimeout(() => cartIcon.classList.remove("animate"), 600);
+  const icon = document.querySelector(".cart-icon");
+  if (!icon) return;
+  icon.classList.add("animate");
+  setTimeout(() => icon.classList.remove("animate"), 600);
 }
 
-function toggleDeliveryFields() {
-    const delivery = document.getElementById("deliveryMethod").value;
-    const fields = document.getElementById("deliveryFields");
-    if (delivery === "Envío a domicilio") {
-        fields.style.display = "block";
-    } else {
-        fields.style.display = "none";
-    }
-}
+window.toggleDeliveryFields = function () {
+  const delivery = document.getElementById("deliveryMethod")?.value;
+  const fields = document.getElementById("deliveryFields");
+  if (!fields) return;
 
+  fields.style.display =
+    delivery === "Envío a domicilio" ? "block" : "none";
+};
 
-// ==========================
-// 🔹 7) FINALIZAR PEDIDO
-// ==========================
-async function finalizarPedido() {
-    if (cart.length === 0) {
-        alert("El carrito está vacío");
-        return;
-    }
+/* ======================================================
+   🔹 FINALIZAR PEDIDO
+====================================================== */
 
-    const metodo = document.getElementById("paymentMethod").value;
-    const entrega = document.getElementById("deliveryMethod").value;
-    const direccion = document.getElementById("direccion").value || "Retiro";
-    const telefono = document.getElementById("telefono").value || "No proporcionado";
+window.finalizarPedido = async function () {
+  if (cart.length === 0) {
+    alert("El carrito está vacío");
+    return;
+  }
 
-    let mensaje = `📦 *NUEVO PEDIDO*%0A%0A`;
-    mensaje += `*Productos:*%0A`;
-    cart.forEach(item => {
-        mensaje += `- ${item.nombre} x1: $${item.precio}%0A`;
+  const nombre = cleanString(document.getElementById("nombreCliente")?.value);
+  const apellido = cleanString(document.getElementById("apellidoCliente")?.value);
+  const telefono = cleanString(document.getElementById("telefono")?.value);
+
+  if (!nombre || !apellido || !telefono) {
+    alert("⚠️ Completá nombre, apellido y teléfono.");
+    return;
+  }
+
+  const metodo = document.getElementById("paymentMethod")?.value || "Efectivo";
+  const entrega = document.getElementById("deliveryMethod")?.value || "Retiro";
+  const direccion = cleanString(document.getElementById("direccion")?.value);
+
+  if (entrega === "Envío a domicilio" && !direccion) {
+    alert("⚠️ Tenés que ingresar la dirección para el envío.");
+    return;
+  }
+
+  const total = cart.reduce((a, b) => a + toNumber(b.precio), 0);
+
+  let pedidoId = null;
+  try {
+    pedidoId = await crearVenta({
+      productos: cart,
+      total,
+      telefono,
+      direccion: entrega === "Envío a domicilio" ? direccion : "Retiro",
+      metodo,
+      entrega,
+      notas: `${nombre} ${apellido}`
     });
-    const total = cart.reduce((a, b) => a + b.precio, 0);
-    mensaje += `%0A*Total: $${total}*%0A`;
-    mensaje += `*Método de pago:* ${metodo}%0A`;
-    mensaje += `*Entrega:* ${entrega}%0A`;
-    if (entrega === "Envío a domicilio") {
-        mensaje += `*Dirección:* ${direccion}%0A`;
-        mensaje += `*Teléfono:* ${telefono}%0A`;
-    }
+  } catch (e) {
+    console.error("Error guardando venta:", e);
+  }
 
-    // Primero intentamos guardar la venta en Firestore
-    try {
-        await guardarVenta(metodo, entrega, direccion, telefono, total, cart);
-        console.log('Venta registrada correctamente en Firestore');
-    } catch (e) {
-        console.error('No se pudo registrar la venta en Firestore:', e);
-    }
+  // 📲 WHATSAPP
+  let mensaje = `NUEVO PEDIDO\n\n`;
 
-    // Abrir WhatsApp con el pedido
-    window.open(`https://wa.me/543516577826?text=${mensaje}`, "_blank");
+  if (pedidoId) mensaje += `Pedido: ${pedidoId}\n\n`;
 
-    alert("Pedido enviado! Gracias por tu compra");
-    cart = [];
-    localStorage.setItem("carrito", JSON.stringify(cart));
-    actualizarCartCount();
-    closeCart();
-}
+  mensaje += `Cliente: ${nombre} ${apellido}\n`;
+  mensaje += `Teléfono: ${telefono}\n\n`;
+
+  cart.forEach(p => {
+    mensaje += `- ${p.nombre} ($${p.precio})\n`;
+  });
+
+  mensaje += `\nTotal: $${total}\n`;
+  mensaje += `Pago: ${metodo}\n`;
+  mensaje += `Entrega: ${entrega}\n`;
+
+  if (entrega === "Envío a domicilio") {
+    mensaje += `Dirección: ${direccion}\n`;
+  }
+
+  const mensajeCodificado = encodeURIComponent(mensaje);
+
+  window.open(
+  `https://wa.me/5493516577826?text=${mensajeCodificado}`,
+  "_blank"
+);
 
 
-// ==========================
-// 🔥 8) EXPONER FUNCIONES GLOBALES Y CARGAR
-// ==========================
-window.mostrarSeccion = mostrarSeccion;
-window.agregarCarrito = agregarCarrito;
-window.openCart = openCart;
-window.closeCart = closeCart;
-window.eliminarItem = eliminarItem;
-window.toggleDeliveryFields = toggleDeliveryFields;
-window.finalizarPedido = finalizarPedido;
-
-// Cargar al inicio
-actualizarCartCount();
-mostrarSeccion('tragos');
-
-// Debug helper to log current arrays
-window.debugShowArrays = function() {
-    console.log('DEBUG tragos:', tragos);
-    console.log('DEBUG promos:', promos);
-    console.log('DEBUG comidas:', comidas);
-}
+  // 🧹 LIMPIAR
+  cart = [];
+  localStorage.removeItem("carrito");
+  actualizarCartCount();
+  closeCart();
+};

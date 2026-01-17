@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📦 Pedidos en Vivo - VLACK</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+<audio id="pedidoSound" preload="auto">
+  <source src="pedido.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🔐 LOGIN -->
+<div class="login-container" id="loginBox">
+  <h2>🔐 INGRESAR ADMIN</h2>
+  <input type="email" id="user" placeholder="📧 Usuario (email)">
+  <input type="password" id="pass" placeholder="🔑 Contraseña">
+  <button onclick="login()">✓ Ingresar</button>
+</div>
+
+<!-- 📦 PANEL PEDIDOS -->
+<div id="pedidosPanel" style="display:none; padding:20px;">
+
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>📦 Pedidos en Vivo</h1>
+    <button onclick="logout()">🚪 Cerrar sesión</button>
+  </div>
+
+  <p id="adminStatus"></p>
+
+  <!-- FILTROS -->
+  <div class="filtro-estado">
+    <button onclick="filtrar('todos')">Todos</button>
+    <button onclick="filtrar('Pendiente')">Pendiente</button>
+    <button onclick="filtrar('Preparando')">Preparando</button>
+    <button onclick="filtrar('Listo')">Listo</button>
+    <button onclick="filtrar('Entregado')">Entregado</button>
+    <button onclick="filtrar('Cancelado')">Cancelado</button>
+  </div>
+
+  <!-- LISTA -->
+  <div id="pedidosList" style="margin-top:20px;">
+    Cargando pedidos...
+  </div>
+</div>
+
+<!-- 🔥 SCRIPTS -->
+<script type="module">
+  import { auth } from "./firebase.js";
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+  import {
+    cargarVentasEnTiempoReal,
+    actualizarEstadoVenta
+  } from "./ventas.js";
+
+  let pedidosGlobal = [];
+  let filtroEstado = "todos";
+
+  // LOGIN
+  window.login = function () {
+    signInWithEmailAndPassword(
+      auth,
+      user.value,
+      pass.value
+    ).catch(() => alert("Usuario o contraseña incorrectos"));
+  };
+
+  // LOGOUT
+  window.logout = () => signOut(auth);
+
+  // FILTRO
+  window.filtrar = function (estado) {
+    filtroEstado = estado;
+    renderPedidos();
+  };
+
+  // AUTH
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      loginBox.style.display = "none";
+      pedidosPanel.style.display = "block";
+      adminStatus.textContent = `Logueado como: ${user.email}`;
+
+      cargarVentasEnTiempoReal((ventas) => {
+        pedidosGlobal = ventas;
+        renderPedidos();
+      });
+
+    } else {
+      loginBox.style.display = "block";
+      pedidosPanel.style.display = "none";
+    }
+  });
+
+  function renderPedidos() {
+    let lista = pedidosGlobal;
+
+    if (filtroEstado !== "todos") {
+      lista = pedidosGlobal.filter(p => p.estado === filtroEstado);
+    }
+
+    if (lista.length === 0) {
+      pedidosList.innerHTML = "<p>No hay pedidos</p>";
+      return;
+    }
+
+    pedidosList.innerHTML = lista.map(p => `
+      <div style="border:1px solid #333; padding:15px; margin-bottom:10px;">
+        <b>$${p.total}</b> - ${p.estado}<br>
+        📞 ${p.telefono || "Sin teléfono"}<br>
+        🚚 ${p.entrega}<br><br>
+
+        ${(p.productos || []).map(x => `• ${x.nombre} - $${x.precio}`).join("<br>")}
+
+        <div style="margin-top:10px;">
+          <button onclick="cambiarEstado('${p.id}','Preparando')">Aceptar</button>
+          <button onclick="cambiarEstado('${p.id}','Listo')">Listo</button>
+          <button onclick="cambiarEstado('${p.id}','Entregado')">Entregado</button>
+          <button onclick="cambiarEstado('${p.id}','Cancelado')">Cancelar</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.cambiarEstado = async function (id, estado) {
+    const pedido = pedidosGlobal.find(p => p.id === id);
+    if (!pedido) return;
+
+    await actualizarEstadoVenta(id, estado);
+
+    if (pedido.telefono) {
+      const msg = encodeURIComponent(
+        `Hola 👋\nTu pedido está ahora en estado: ${estado}\nTotal: $${pedido.total}\nGracias por tu compra 🍹`
+      );
+      window.open(`https://wa.me/${pedido.telefono}?text=${msg}`, "_blank");
+    }
+  };
+</script>
+
+</body>
+</html>

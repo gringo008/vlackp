@@ -1,184 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛡️ Admin VLACK</title>
-    <link rel="stylesheet" href="admin.css">
-    <style>
-        .header-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-
-        .btn-reportes {
-            background: linear-gradient(135deg, #0f0 0%, #00ff99 100%);
-            color: black;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 255, 0, 0.2);
-        }
-
-        .btn-reportes:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 255, 0, 0.4);
-        }
-
-        .btn-logout {
-            background: linear-gradient(135deg, #ff6600 0%, #ff0055 100%);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 0, 85, 0.2);
-        }
-
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255, 0, 85, 0.4);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Admin VLACK</title>
+  <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
-<!-- LOGIN -->
+<!-- 🔐 LOGIN -->
 <div class="login-container" id="loginBox">
-    <h2>🔐 INGRESAR ADMIN</h2>
-    <input type="email" id="user" placeholder="📧 Usuario (email)">
-    <input type="password" id="pass" placeholder="🔑 Contraseña">
-    <button onclick="login()">✓ Ingresar</button>
+  <h2>🔐 INGRESAR ADMIN</h2>
+  <input type="email" id="user" placeholder="📧 Usuario (email)">
+  <input type="password" id="pass" placeholder="🔑 Contraseña">
+  <button onclick="login()">✓ Ingresar</button>
 </div>
 
+<!-- 🧭 PANEL CENTRAL -->
+<div id="adminPanel" style="display:none; padding:20px; text-align:center;">
 
-<!-- PANEL ADMIN -->
-<div id="adminPanel" style="display:none;">
-    <div class="header-buttons">
-        <button class="btn-reportes" onclick="window.location.href='reportes.html'">📊 Ver Reportes</button>
-        <button class="btn-logout" onclick="logout()">🚪 Cerrar Sesión</button>
-    </div>
+  <h1>⚙️ Panel de Administración</h1>
+  <p id="adminStatus">No autenticado</p>
 
-    <h1>⚙️ Panel de Administración</h1>
+  <div style="display:flex; flex-direction:column; gap:15px; max-width:300px; margin:30px auto;">
+    
+    <button onclick="location.href='productos.html'">
+      🍹 Administrar Productos
+    </button>
 
-    <!-- Estado del admin (se actualiza tras login) -->
-    <div id="adminStatus" style="margin-bottom:12px; color:#0f0; font-weight:700;">No autenticado</div>
+    <button onclick="location.href='pedidos.html'">
+      📦 Pedidos en Vivo
+    </button>
 
-    <!-- NAV BAR -->
-    <nav class="nav-bar">
-        <button onclick="mostrarSeccion('tragos')">🍸 Tragos</button>
-        <button onclick="mostrarSeccion('promos')">⭐ Promos</button>
-        <button onclick="mostrarSeccion('comidas')">🍕 Comidas</button>
-    </nav>
+    <button onclick="location.href='reportes.html'">
+      📊 Reportes
+    </button>
 
-    <!-- SECCIÓN TRAGOS -->
-    <section id="seccion-tragos" class="seccion-panel active">
-        <h3>🍹 Agregar nuevo trago</h3>
-        <input type="text" id="tragoNombre" placeholder="Nombre del trago">
-        <input type="number" id="tragoPrecio" placeholder="Precio" step="0.01">
-        <label for="tragoImagenSelect">🖼️ Seleccionar imagen:</label>
-        <select id="tragoImagenSelect">
-            <option value="">-- Elegir imagen --</option>
-            <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
-            <option value="img/flynpaff.jpeg">flynpaff</option>
-            <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
-            <option value="img/lemondchamp.jpeg">lemondchamp</option>
-            <option value="img/milipili.jpeg">milipili</option>
-            <option value="img/sangria frozzen.jpg">sangria frozzen</option>
-            <option value="img/serenito con vos.jpeg">serenito con vos</option>
-        </select>
-        <input type="file" id="tragoImagenArchivo" accept="image/*">
-        <input type="text" id="tragoImagenURL" placeholder="O pegar URL de la imagen">
-        <div style="margin-top:8px; margin-bottom:8px;">
-            <label><input type="checkbox" id="skipUploadTrago"> Crear sin subir archivo (usar URL o dejar vacío)</label>
-        </div>
-        <button class="admin-action" onclick="agregarTrago()" disabled>✓ Agregar</button>
+    <button onclick="logout()" style="background:#a00; color:white;">
+      🚪 Cerrar Sesión
+    </button>
 
-        <h3>📋 Tragos cargados</h3>
-        <table id="tablaTragos">
-            <thead>
-                <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </section>
-
-    <!-- SECCIÓN PROMOS -->
-    <section id="seccion-promos" class="seccion-panel" style="display:none;">
-        <h3>⭐ Agregar promo</h3>
-        <input type="text" id="promoNombre" placeholder="Nombre de la promo">
-        <input type="number" id="promoPrecio" placeholder="Precio" step="0.01">
-        <label for="promoImagenSelect">🖼️ Seleccionar imagen:</label>
-        <select id="promoImagenSelect">
-            <option value="">-- Elegir imagen --</option>
-            <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
-            <option value="img/flynpaff.jpeg">flynpaff</option>
-            <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
-            <option value="img/lemondchamp.jpeg">lemondchamp</option>
-            <option value="img/milipili.jpeg">milipili</option>
-            <option value="img/sangria frozzen.jpg">sangria frozzen</option>
-            <option value="img/serenito con vos.jpeg">serenito con vos</option>
-        </select>
-        <input type="file" id="promoImagenArchivo" accept="image/*">
-        <input type="text" id="promoImagenURL" placeholder="O pegar URL">
-        <div style="margin-top:8px; margin-bottom:8px;">
-            <label><input type="checkbox" id="skipUploadPromo"> Crear sin subir archivo (usar URL o dejar vacío)</label>
-        </div>
-        <button class="admin-action" onclick="agregarPromo()" disabled>✓ Agregar</button>
-
-        <h3>📋 Promos cargadas</h3>
-        <table id="tablaPromos">
-            <thead>
-                <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </section>
-
-    <!-- SECCIÓN COMIDAS -->
-    <section id="seccion-comidas" class="seccion-panel" style="display:none;">
-        <h3>🍕 Agregar comida</h3>
-        <input type="text" id="comidaNombre" placeholder="Nombre de la comida">
-        <input type="number" id="comidaPrecio" placeholder="Precio" step="0.01">
-        <label for="comidaImagenSelect">🖼️ Seleccionar imagen:</label>
-        <select id="comidaImagenSelect">
-            <option value="">-- Elegir imagen --</option>
-            <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
-            <option value="img/flynpaff.jpeg">flynpaff</option>
-            <option value="img/fondo de pantralla mili y sere.jpeg">fondo de pantalla mili y sere</option>
-            <option value="img/lemondchamp.jpeg">lemondchamp</option>
-            <option value="img/milipili.jpeg">milipili</option>
-            <option value="img/sangria frozzen.jpg">sangria frozzen</option>
-            <option value="img/serenito con vos.jpeg">serenito con vos</option>
-        </select>
-        <input type="file" id="comidaImagenArchivo" accept="image/*">
-        <input type="text" id="comidaImagenURL" placeholder="O pegar URL">
-        <div style="margin-top:8px; margin-bottom:8px;">
-            <label><input type="checkbox" id="skipUploadComida"> Crear sin subir archivo (usar URL o dejar vacío)</label>
-        </div>
-        <button class="admin-action" onclick="agregarComida()" disabled>✓ Agregar</button>
-
-        <h3>📋 Comidas cargadas</h3>
-        <table id="tablaComidas">
-            <thead>
-                <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </section>
-
+  </div>
 </div>
 
-<!-- SIEMPRE CARGAR FIREBASE ANTES DEL ADMIN -->
+<!-- 🔥 SCRIPTS -->
 <script type="module" src="firebase.js"></script>
-<script type="module" src="admin.js"></script>
+
+<script type="module">
+  import { auth } from "./firebase.js";
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+  // LOGIN
+  window.login = function () {
+    const email = document.getElementById("user").value;
+    const pass = document.getElementById("pass").value;
+
+    signInWithEmailAndPassword(auth, email, pass)
+      .catch(() => alert("Usuario o contraseña incorrectos"));
+  };
+
+  // LOGOUT
+  window.logout = function () {
+    signOut(auth);
+  };
+
+  // AUTH STATE
+  onAuthStateChanged(auth, (user) => {
+    const loginBox = document.getElementById("loginBox");
+    const panel = document.getElementById("adminPanel");
+    const status = document.getElementById("adminStatus");
+
+    if (user) {
+      loginBox.style.display = "none";
+      panel.style.display = "block";
+      status.textContent = `Logueado como: ${user.email}`;
+    } else {
+      loginBox.style.display = "block";
+      panel.style.display = "none";
+      status.textContent = "No autenticado";
+    }
+  });
+</script>
 
 </body>
 </html>

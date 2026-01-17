@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍹 Productos - Admin VLACK</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN -->
+<div class="login-container" id="loginBox">
+  <h2>🔐 INGRESAR ADMIN</h2>
+  <input type="email" id="user" placeholder="📧 Usuario (email)">
+  <input type="password" id="pass" placeholder="🔑 Contraseña">
+  <button onclick="login()">✓ Ingresar</button>
+</div>
+
+<!-- 🧭 PANEL PRODUCTOS -->
+<div id="productosPanel" style="display:none; padding:20px;">
+
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>🍹 Administración de Productos</h1>
+    <button onclick="logout()">🚪 Cerrar sesión</button>
+  </div>
+
+  <p id="adminStatus"></p>
+
+  <!-- NAV -->
+  <nav class="nav-bar">
+    <button onclick="mostrarSeccion('tragos')">🍸 Tragos</button>
+    <button onclick="mostrarSeccion('promos')">⭐ Promos</button>
+    <button onclick="mostrarSeccion('comidas')">🍕 Comidas</button>
+    <button onclick="location.href='admin.html'">⬅ Volver</button>
+  </nav>
+
+  <!-- ================= TRAGOS ================= -->
+  <section id="seccion-tragos" class="seccion-panel">
+    <h3>🍸 Agregar Trago</h3>
+
+    <input id="tragosNombre" placeholder="Nombre">
+    <input id="tragosPrecio" type="number" placeholder="Precio">
+
+    <label>🖼️ Imagen:</label>
+    <select id="tragosImagenSelect">
+      <option value="">-- Elegir imagen --</option>
+      <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+      <option value="img/flynpaff.jpeg">flynpaff</option>
+      <option value="img/lemondchamp.jpeg">lemondchamp</option>
+      <option value="img/milipili.jpeg">milipili</option>
+      <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+      <option value="img/serenito con vos.jpeg">serenito con vos</option>
+    </select>
+
+    <input id="tragosImagenURL" placeholder="O pegar URL de imagen">
+
+    <button onclick="agregar('tragos')">Agregar</button>
+
+    <h3>Listado</h3>
+    <div id="lista-tragos"></div>
+  </section>
+
+  <!-- ================= PROMOS ================= -->
+  <section id="seccion-promos" class="seccion-panel" style="display:none;">
+    <h3>⭐ Agregar Promo</h3>
+
+    <input id="promosNombre" placeholder="Nombre">
+    <input id="promosPrecio" type="number" placeholder="Precio">
+
+    <label>🖼️ Imagen:</label>
+    <select id="promosImagenSelect">
+      <option value="">-- Elegir imagen --</option>
+      <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+      <option value="img/flynpaff.jpeg">flynpaff</option>
+      <option value="img/lemondchamp.jpeg">lemondchamp</option>
+      <option value="img/milipili.jpeg">milipili</option>
+      <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+      <option value="img/serenito con vos.jpeg">serenito con vos</option>
+    </select>
+
+    <input id="promosImagenURL" placeholder="O pegar URL de imagen">
+
+    <button onclick="agregar('promos')">Agregar</button>
+
+    <h3>Listado</h3>
+    <div id="lista-promos"></div>
+  </section>
+
+  <!-- ================= COMIDAS ================= -->
+  <section id="seccion-comidas" class="seccion-panel" style="display:none;">
+    <h3>🍕 Agregar Comida</h3>
+
+    <input id="comidasNombre" placeholder="Nombre">
+    <input id="comidasPrecio" type="number" placeholder="Precio">
+
+    <label>🖼️ Imagen:</label>
+    <select id="comidasImagenSelect">
+      <option value="">-- Elegir imagen --</option>
+      <option value="img/flynpaff y serenito.jpeg">flynpaff y serenito</option>
+      <option value="img/flynpaff.jpeg">flynpaff</option>
+      <option value="img/lemondchamp.jpeg">lemondchamp</option>
+      <option value="img/milipili.jpeg">milipili</option>
+      <option value="img/sangria frozzen.jpg">sangria frozzen</option>
+      <option value="img/serenito con vos.jpeg">serenito con vos</option>
+    </select>
+
+    <input id="comidasImagenURL" placeholder="O pegar URL de imagen">
+
+    <button onclick="agregar('comidas')">Agregar</button>
+
+    <h3>Listado</h3>
+    <div id="lista-comidas"></div>
+  </section>
+
+</div>
+
+<!-- 🔥 SCRIPT -->
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+  import {
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  // LOGIN
+  window.login = () =>
+    signInWithEmailAndPassword(auth, user.value, pass.value)
+      .catch(() => alert("Login incorrecto"));
+
+  // LOGOUT
+  window.logout = () => signOut(auth);
+
+  // AUTH
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      loginBox.style.display = "none";
+      productosPanel.style.display = "block";
+      adminStatus.textContent = `Logueado como: ${user.email}`;
+      cargarTodo();
+    } else {
+      loginBox.style.display = "block";
+      productosPanel.style.display = "none";
+    }
+  });
+
+  // NAV
+  window.mostrarSeccion = (sec) => {
+    document.querySelectorAll(".seccion-panel").forEach(s => s.style.display = "none");
+    document.getElementById(`seccion-${sec}`).style.display = "block";
+  };
+
+  // CRUD
+  async function cargarTodo() {
+    cargar("tragos");
+    cargar("promos");
+    cargar("comidas");
+  }
+
+  async function cargar(col) {
+    const cont = document.getElementById(`lista-${col}`);
+    cont.innerHTML = "Cargando...";
+    const data = await getDocs(collection(db, col));
+
+    cont.innerHTML = data.docs.map(d => {
+      const p = d.data();
+      return `
+        <div style="border:1px solid #444; padding:10px; margin:5px;">
+          <b>${p.nombre}</b> - $${p.precio}<br>
+          ${p.imagen ? `<img src="${p.imagen}" width="80"><br>` : ""}
+          <button onclick="editar('${col}','${d.id}')">✏️</button>
+          <button onclick="eliminar('${col}','${d.id}')">❌</button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.agregar = async (col) => {
+    const nombre = document.getElementById(col + "Nombre").value;
+    const precio = document.getElementById(col + "Precio").value;
+    const imgSelect = document.getElementById(col + "ImagenSelect").value;
+    const imgURL = document.getElementById(col + "ImagenURL").value;
+
+    const imagen = imgSelect || imgURL;
+
+    if (!nombre || !precio) {
+      alert("Faltan datos");
+      return;
+    }
+
+    await addDoc(collection(db, col), { nombre, precio, imagen });
+    cargar(col);
+  };
+
+  window.eliminar = async (col, id) => {
+    if (!confirm("Eliminar producto?")) return;
+    await deleteDoc(doc(db, col, id));
+    cargar(col);
+  };
+
+  window.editar = async (col, id) => {
+    const nombre = prompt("Nuevo nombre");
+    const precio = prompt("Nuevo precio");
+    const imagen = prompt("Nueva imagen (URL)");
+
+    if (!nombre || !precio) return;
+
+    await updateDoc(doc(db, col, id), { nombre, precio, imagen });
+    cargar(col);
+  };
+</script>
+
+</body>
+</html>
